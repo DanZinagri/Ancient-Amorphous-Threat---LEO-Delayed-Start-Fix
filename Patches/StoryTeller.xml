@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+	<!-- AAT adds its opening "Suspicious debris" incident as a vanilla SingleOnceFixed comp, which only tries during one
+	     exact 1000-tick interval. If anything blocks it then (LEO Events' tech gate, a bad drop cell), the storyline never
+	     starts. Swap it for a comp that keeps offering the incident until it has fired once. -->
+	<Operation Class="PatchOperationReplace">
+		<xpath>Defs/StorytellerDef[@Name="BaseStoryteller"]/comps/li[@Class="StorytellerCompProperties_SingleOnceFixed" and incident="BreadMo_AAT_ChunkIncident"]</xpath>
+		<value>
+			<li Class="AATDelayedStartFix.StorytellerCompProperties_OnceCatchUp">
+				<fireAfterDaysPassed>0.5</fireAfterDaysPassed>
+				<incident>BreadMo_AAT_ChunkIncident</incident>
+				<minColonistCount>1</minColonistCount>
+				<allowedTargetTags>
+					<li>Map_PlayerHome</li>
+				</allowedTargetTags>
+			</li>
+		</value>
+	</Operation>
+</Patch>

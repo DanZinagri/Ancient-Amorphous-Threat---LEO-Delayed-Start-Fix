@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<name>Ancient Amorphous Threat - LEO Delayed Start Fix</name>
+	<author>DanZinagri</author>
+	<packageId>DanZinagri.AAT.DelayedStartFix</packageId>
+	<supportedVersions>
+		<li>1.6</li>
+		<li>1.7</li>
+	</supportedVersions>
+	<description>Delayed AAT debris still fires once.</description>
+	<modDependencies>
+		<li>
+			<packageId>XMB.AncientThreat.MO</packageId>
+			<displayName>Ancient amorphous threat</displayName>
+			<steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=3313313985</steamWorkshopUrl>
+		</li>
+	</modDependencies>
+	<loadAfter>
+		<li>XMB.AncientThreat.MO</li>
+	</loadAfter>
+</ModMetaData>
