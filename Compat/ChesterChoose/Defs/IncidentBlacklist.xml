@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+	<!-- Chester turns every incident into a pick-a-card window, which the catch-up comp would keep reopening until the
+	     player picks the debris, and also deals incidents at random. Blacklisted incidents skip all of that: Chester's
+	     TryFire prefix lets them through to vanilla, so the debris just arrives once. -->
+	<ChesterChoose.IncidentBlacklistDef>
+		<defName>AATDelayedStartFix_IncidentBlacklist</defName>
+		<blacklist>
+			<li>BreadMo_AAT_ChunkIncident</li>
+		</blacklist>
+	</ChesterChoose.IncidentBlacklistDef>
+</Defs>
