@@ -10,6 +10,9 @@ namespace AATDelayedStartFix
         public IncidentDef incident;
         public float fireAfterDaysPassed;
         public int minColonistCount;
+        // How often a blocked incident is retried once its time has come. Vanilla checks storyteller comps every
+        // 1000 ticks; retrying that often spams other mods' TryFire hooks (Chester Choose's diagnostic log) for no gain.
+        public float retryIntervalDays = 1f;
 
         public StorytellerCompProperties_OnceCatchUp()
         {
@@ -18,7 +21,7 @@ namespace AATDelayedStartFix
     }
 
     // Vanilla SingleOnceFixed, except the time check is "at or after" instead of "exactly at", so an incident that was
-    // blocked when its moment came (LEO's tech gate) is offered again every storyteller interval until it fires.
+    // blocked when its moment came (LEO's tech gate) is offered again (once per retryIntervalDays) until it fires.
     //
     // One-time guarantee: Storyteller.TryFire records a successful fire in the target's StoryState.lastFireTicks
     // before the next comp/target is evaluated, so AlreadyHappened() sees it straight away and latches the saved flag.
@@ -49,16 +52,32 @@ namespace AATDelayedStartFix
                 }
                 ticksSinceStart -= target.StoryState.GetTicksFromColonistCount(Props.minColonistCount);
             }
-            if (ticksSinceStart < Props.fireAfterDaysPassed * GenDate.TicksPerDay)
+            int ticksOverdue = ticksSinceStart - (int)(Props.fireAfterDaysPassed * GenDate.TicksPerDay);
+            if (ticksOverdue < 0)
+            {
+                yield break;
+            }
+
+            // Stateless throttle: the storyteller asks once per 1000 ticks, so exactly one ask lands in each 1000-tick
+            // window. The first is at the due time, then one per retry period. No saved tick, so Chester's simulated
+            // look-ahead can't push the next real try back.
+            int retryTicks = (int)(Props.retryIntervalDays * GenDate.TicksPerDay);
+            if (retryTicks > 1000 && ticksOverdue % retryTicks >= 1000)
             {
                 yield break;
             }
 
             IncidentDef incident = Props.incident;
-            if (incident.TargetAllowed(target))
+            if (!incident.TargetAllowed(target))
             {
-                // CanFireNow (and with it LEO's gate) runs in Storyteller.TryFire; a refusal just means "try next interval".
-                yield return new FiringIncident(incident, this, GenerateParms(incident.category, target));
+                yield break;
+            }
+            // Ask CanFireNow (where LEO's gate sits) before handing the incident to the storyteller, so a gated attempt
+            // never reaches Storyteller.TryFire or anything hooked onto it. TryFire asks again; vanilla caches it per tick.
+            IncidentParms parms = GenerateParms(incident.category, target);
+            if (incident.Worker.CanFireNow(parms))
+            {
+                yield return new FiringIncident(incident, this, parms);
             }
         }
 

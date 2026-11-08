@@ -10,6 +10,8 @@
 				<fireAfterDaysPassed>0.5</fireAfterDaysPassed>
 				<incident>BreadMo_AAT_ChunkIncident</incident>
 				<minColonistCount>1</minColonistCount>
+				<!-- once overdue (blocked by a tech gate etc.), try again once per this many days -->
+				<retryIntervalDays>1</retryIntervalDays>
 				<allowedTargetTags>
 					<li>Map_PlayerHome</li>
 				</allowedTargetTags>
